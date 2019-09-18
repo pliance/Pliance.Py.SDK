@@ -71,7 +71,7 @@ class TestSum(unittest.TestCase):
             'classification': 'FalsePositive'
         }
 
-        res = client.unarchivePerson(person)
+        res = client.classifyPersonMatch(person)
 
         self.assertEqual(res['status'], 'Success')
 
