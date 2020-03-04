@@ -72,17 +72,20 @@ class TestSum(unittest.TestCase):
         client = clientFactory.create('Adam', '1')
         id = self.randomString()
         registerPerson = {
-            'firstName': 'Osama',
-            'lastName': 'bin laden',
-            'personReferenceId': id
+            'firstName': 'Ebba',
+            'lastName': 'Busch',
+            'personReferenceId': id,
+            'identity': {
+                "country": "se"
+            }
         }
 
         res = client.registerPerson(registerPerson)
 
         person = {
             'personReferenceId': id,
-            'matchId': 'EuSanction-833',
-            'aliasId': 'a1be37af314c0cc35c5f9f4124f5f6aa0c050fbe5846e020ae17c0fe02c8c55e',
+            'matchId': 'Bogard-13935',
+            'aliasId': '55601e25d6c885e8e7c549970315016196bb01c9ff22aa796d81ba5469c87a8c',
             'classification': 'FalsePositive'
         }
 
