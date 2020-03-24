@@ -31,7 +31,6 @@ class ClientFactory:
         response = requests.get(f'{self.url}api/{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
         return response.json()
 
-        
     def executeDelete(self, endpoint, payload, givenName, subject):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
@@ -46,9 +45,8 @@ class ClientFactory:
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=300),
                 'aud': 'pliance.io',
                 'iss': self.issuer,
-                'given_name': 'Adam Furtenbach',
-                'sub': '1337',
-                'id': 1
+                'given_name': givenName,
+                'sub': subject
             }, self.secret, algorithm='HS256')
         return token
 
@@ -61,27 +59,29 @@ class PlianceClient:
     def ping(self):
         return self.__executeGet('ping')
 
+    # Company
     def registerPerson(self, person):
         return self.__executePut('PersonCommand', person)
 
     def viewPerson(self, person):
         return self.__executeGet('PersonQuery', payload=person)
 
-    def classifyPersonMatch(self, person):
-        return self.__executePost('PersonCommand/Classify', person)
-
     def searchPerson(self, query):
-        return self.__executeGet('PersonQuery/search', payload=query)
-
-    def archivePerson(self, person):
-        return self.__executePost('PersonCommand/archive', person)
-
-    def unarchivePerson(self, person):
-        return self.__executePost('PersonCommand/unarchive', person)
+        return self.__executeGet('PersonQuery/Search', payload=query)
 
     def deletePerson(self, person):
         return self.__executeDelete('PersonCommand', person)
 
+    def archivePerson(self, person):
+        return self.__executePost('PersonCommand/Archive', person)
+
+    def unarchivePerson(self, person):
+        return self.__executePost('PersonCommand/Unarchive', person)
+
+    def classifyPersonMatch(self, person):
+        return self.__executePost('PersonCommand/Classify', person)
+
+    # Person
     def registerCompany(self, company):
         return self.__executePut('CompanyCommand', company)
 
@@ -89,25 +89,60 @@ class PlianceClient:
         return self.__executeGet('CompanyQuery', payload=company)
 
     def searchCompany(self, query):
-        return self.__executeGet('CompanyQuery/search', payload=query)
-
-    def archiveCompany(self, company):
-        return self.__executePost('CompanyCommand/archive', company)
-
-    def unarchiveCompany(self, company):
-        return self.__executePost('CompanyCommand/unarchive', company)
+        return self.__executeGet('CompanyQuery/Search', payload=query)
 
     def deleteCompany(self, company):
         return self.__executeDelete('CompanyCommand', company)
 
+    def archiveCompany(self, company):
+        return self.__executePost('CompanyCommand/Archive', company)
+
+    def unarchiveCompany(self, company):
+        return self.__executePost('CompanyCommand/Unarchive', company)
+
+    def classifyCompanyMatch(self, company):
+        return self.__executePost('CompanyCommand/Classify', company)        
+
+    # Feed
+    def feed(self, feed):
+        return self.__executeGet('FeedQuery', payload=feed)
+
+    # Watchlist
+    def watchlistPerson(self, query):
+        return self.__executeGet('WatchlistQuery/', payload=query)       
+
+    def watchlistPerson_v2(self, query):
+        return self.__executeGet('WatchlistQuery/v2', payload=query) 
+
+    def watchlistCompany(self, query):
+        return self.__executeGet('WatchlistQuery/Company', payload=query) 
+
+    ## Internal
     def __executeGet(self, endpoint, payload=None):
-        return self.factory.executeGet(endpoint, self.givenName, self.subject, payload=payload)
+        result = self.factory.executeGet(endpoint, self.givenName, self.subject, payload=payload)
+        
+        return self.__throw_on_error(result)
 
     def __executePut(self, endpoint, data):
-        return self.factory.executePut(endpoint, data, self.givenName, self.subject)
+        result = self.factory.executePut(endpoint, data, self.givenName, self.subject)
+        
+        return self.__throw_on_error(result)
 
     def __executePost(self, endpoint, data):
-        return self.factory.executePost(endpoint, data, self.givenName, self.subject)
+        result = self.factory.executePost(endpoint, data, self.givenName, self.subject)
+        
+        return self.__throw_on_error(result)
 
     def __executeDelete(self, endpoint, data):
-        return self.factory.executeDelete(endpoint, data, self.givenName, self.subject)
+        result = self.factory.executeDelete(endpoint, data, self.givenName, self.subject)
+        
+        return self.__throw_on_error(result)
+
+    def __throw_on_error(self, payload):
+        if payload['status'] != 'Success':
+            raise ApiException()
+
+        return payload
+
+class ApiException(Exception):
+    pass
