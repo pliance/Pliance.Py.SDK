@@ -117,6 +117,13 @@ class PlianceClient:
     def watchlistCompany(self, query):
         return self.__executeGet('WatchlistQuery/Company', payload=query) 
 
+    # Webhook
+    def webhookGet(self, query):
+        return self.__executeGet('WebhookCommand', payload=query)
+
+    def webhookSave(self, query):
+        return self.__executePut('WebhookQuery', query)
+
     ## Internal
     def __executeGet(self, endpoint, payload=None):
         result = self.factory.executeGet(endpoint, self.givenName, self.subject, payload=payload)
