@@ -107,8 +107,8 @@ class PlianceClient:
         return self.__executePost('CompanyQuery/Graph/Beneficiaries', company)              
 
     # Feed
-    def feed(self, feed):
-        return self.__executeGet('FeedQuery', payload=feed)
+    def feed(self, query):
+        return self.__executeGet('FeedQuery', payload=query)
 
     # Watchlist
     def watchlistPerson(self, query):
