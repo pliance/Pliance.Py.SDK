@@ -22,7 +22,6 @@ class ClientFactory:
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
         response = requests.put(f'{self.url}api/{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
-        #print(response)
         return response.json()
 
     def executeGet(self, endpoint, givenName, subject, payload=None):
@@ -149,7 +148,7 @@ class PlianceClient:
         return self.__throw_on_error(result)
 
     def __throw_on_error(self, payload):
-        if payload['status'] != 'Success':
+        if not payload['success']:
             raise ApiException(payload['message'])
 
         return payload
