@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import unittest
 import contextlib
 import os
@@ -8,7 +10,7 @@ import OpenSSL.crypto #pip install pyopenssl
 import random
 import string
 
-from pliance_py_sdk import ClientFactory
+from pliance_py_sdk import ClientFactory, ApiException
 
 @contextlib.contextmanager
 def pfx_to_pem(pfx_path, pfx_password):
@@ -23,6 +25,7 @@ def pfx_to_pem(pfx_path, pfx_password):
     if ca is not None:
         for cert in ca:
             f_pem.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert))
+
     f_pem.close()
     return t_pem
 
@@ -33,15 +36,35 @@ class TestSum(unittest.TestCase):
         letters = string.ascii_lowercase
         return ''.join(random.choice(letters) for i in range(stringLength))    
 
+    def test_bad_request(self):
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        client = clientFactory.create('Adam', '1')
+
+        person = {
+        }
+
+        try:
+            res = client.registerPerson(person)
+            self.assertTrue(false)
+        except ApiException as error:
+            self.assertEqual(str(error), 'Missing FirstName')
+
     def test_ping(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        client = clientFactory.create('Adam', '1')
+        res = client.ping()
+
+        self.assertEqual(res['message'], 'Pong')
+
+    def test_ping_not_cert(self):
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert=None)
         client = clientFactory.create('Adam', '1')
         res = client.ping()
 
         self.assertEqual(res['message'], 'Pong')
 
     def test_register_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         person = {
@@ -55,7 +78,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['status'], 'Success')
 
     def test_view_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         person = {
@@ -68,7 +91,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['data']['personReferenceId'], 'reference-id')
 
     def test_classify_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
         id = self.randomString()
         registerPerson = {
@@ -94,7 +117,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['status'], 'Success')
 
     def test_search_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         query = {
@@ -113,7 +136,7 @@ class TestSum(unittest.TestCase):
         self.assertTrue(len(res['data']) > 0)
 
     def test_archive_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
         id = self.randomString()
         registerPerson = {
@@ -133,7 +156,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['status'], 'Success')
 
     def test_unarchive_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         person = {
@@ -145,7 +168,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['status'], 'Success')
 
     def test_delete_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
         id = self.randomString()
         registerPerson = {
@@ -166,7 +189,7 @@ class TestSum(unittest.TestCase):
 
 
     def test_register_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         company = {
@@ -183,7 +206,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['status'], 'Success')
 
     def test_view_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         company = {
@@ -195,7 +218,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(res['data']['companyReferenceId'], 'comp-reference-id')
 
     def test_search_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
 
         query = {
@@ -214,7 +237,7 @@ class TestSum(unittest.TestCase):
         self.assertTrue(len(res['data']) > 0)
 
     def test_archive_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',  'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
         id = self.randomString()
 

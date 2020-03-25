@@ -101,7 +101,10 @@ class PlianceClient:
         return self.__executePost('CompanyCommand/Unarchive', company)
 
     def classifyCompanyMatch(self, company):
-        return self.__executePost('CompanyCommand/Classify', company)        
+        return self.__executePost('CompanyCommand/Classify', company)   
+
+    def beneficiariesCompanyGraph(self, company):
+        return self.__executePost('CompanyQuery/Graph/Beneficiaries', company)              
 
     # Feed
     def feed(self, feed):
@@ -109,7 +112,7 @@ class PlianceClient:
 
     # Watchlist
     def watchlistPerson(self, query):
-        return self.__executeGet('WatchlistQuery/', payload=query)       
+        return self.__executeGet('WatchlistQuery', payload=query)       
 
     def watchlistPerson_v2(self, query):
         return self.__executeGet('WatchlistQuery/v2', payload=query) 
@@ -119,10 +122,10 @@ class PlianceClient:
 
     # Webhook
     def webhookGet(self, query):
-        return self.__executeGet('WebhookCommand', payload=query)
+        return self.__executeGet('WebhookQuery', payload=query)
 
     def webhookSave(self, query):
-        return self.__executePut('WebhookQuery', query)
+        return self.__executePut('WebhookCommand', query)
 
     ## Internal
     def __executeGet(self, endpoint, payload=None):
@@ -147,7 +150,7 @@ class PlianceClient:
 
     def __throw_on_error(self, payload):
         if payload['status'] != 'Success':
-            raise ApiException()
+            raise ApiException(payload['message'])
 
         return payload
 
