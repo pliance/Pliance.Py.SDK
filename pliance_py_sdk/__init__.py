@@ -58,7 +58,7 @@ class PlianceClient:
     def ping(self):
         return self.__executeGet('ping')
 
-    # Company
+    # Person
     def registerPerson(self, person):
         return self.__executePut('PersonCommand', person)
 
@@ -77,10 +77,10 @@ class PlianceClient:
     def unarchivePerson(self, person):
         return self.__executePost('PersonCommand/Unarchive', person)
 
-    def classifyPersonMatch(self, person):
+    def classifyCompanyHit(self, person):
         return self.__executePost('PersonCommand/Classify', person)
 
-    # Person
+    # Company
     def registerCompany(self, company):
         return self.__executePut('CompanyCommand', company)
 
@@ -99,7 +99,7 @@ class PlianceClient:
     def unarchiveCompany(self, company):
         return self.__executePost('CompanyCommand/Unarchive', company)
 
-    def classifyCompanyMatch(self, company):
+    def classifyCompanyHit(self, company):
         return self.__executePost('CompanyCommand/Classify', company)   
 
     def beneficiariesCompanyGraph(self, company):
