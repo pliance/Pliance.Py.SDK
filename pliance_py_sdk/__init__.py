@@ -59,51 +59,51 @@ class PlianceClient:
         return self.__executeGet('ping')
 
     # Person
-    def registerPerson(self, person):
-        return self.__executePut('PersonCommand', person)
+    def registerPerson(self, command):
+        return self.__executePut('PersonCommand', command)
 
-    def viewPerson(self, person):
-        return self.__executeGet('PersonQuery', payload=person)
+    def viewPerson(self, query):
+        return self.__executeGet('PersonQuery', payload=query)
 
     def searchPerson(self, query):
         return self.__executeGet('PersonQuery/Search', payload=query)
 
-    def deletePerson(self, person):
-        return self.__executeDelete('PersonCommand', person)
+    def deletePerson(self, command):
+        return self.__executeDelete('PersonCommand', command)
 
-    def archivePerson(self, person):
-        return self.__executePost('PersonCommand/Archive', person)
+    def archivePerson(self, command):
+        return self.__executePost('PersonCommand/Archive', command)
 
-    def unarchivePerson(self, person):
-        return self.__executePost('PersonCommand/Unarchive', person)
+    def unarchivePerson(self, command):
+        return self.__executePost('PersonCommand/Unarchive', command)
 
-    def classifyCompanyHit(self, person):
-        return self.__executePost('PersonCommand/Classify', person)
+    def classifyPersonHit(self, command):
+        return self.__executePost('PersonCommand/Classify', command)
 
     # Company
-    def registerCompany(self, company):
-        return self.__executePut('CompanyCommand', company)
+    def registerCompany(self, query):
+        return self.__executePut('CompanyCommand', query)
 
-    def viewCompany(self, company):
-        return self.__executeGet('CompanyQuery', payload=company)
+    def viewCompany(self, query):
+        return self.__executeGet('CompanyQuery', payload=query)
 
     def searchCompany(self, query):
         return self.__executeGet('CompanyQuery/Search', payload=query)
 
-    def deleteCompany(self, company):
-        return self.__executeDelete('CompanyCommand', company)
+    def deleteCompany(self, command):
+        return self.__executeDelete('CompanyCommand', command)
 
-    def archiveCompany(self, company):
-        return self.__executePost('CompanyCommand/Archive', company)
+    def archiveCompany(self, command):
+        return self.__executePost('CompanyCommand/Archive', command)
 
-    def unarchiveCompany(self, company):
-        return self.__executePost('CompanyCommand/Unarchive', company)
+    def unarchiveCompany(self, command):
+        return self.__executePost('CompanyCommand/Unarchive', command)
 
-    def classifyCompanyHit(self, company):
-        return self.__executePost('CompanyCommand/Classify', company)   
+    def classifyCompanyHit(self, command):
+        return self.__executePost('CompanyCommand/Classify', command)   
 
-    def beneficiariesCompanyGraph(self, company):
-        return self.__executePost('CompanyQuery/Graph/Beneficiaries', company)              
+    def beneficiariesCompanyGraph(self, query):
+        return self.__executePost('CompanyQuery/Graph/Beneficiaries', query)              
 
     # Feed
     def feed(self, query):
@@ -123,8 +123,8 @@ class PlianceClient:
     def webhookGet(self, query):
         return self.__executeGet('WebhookQuery', payload=query)
 
-    def webhookSave(self, query):
-        return self.__executePut('WebhookCommand', query)
+    def webhookSave(self, command):
+        return self.__executePut('WebhookCommand', command)
 
     ## Internal
     def __executeGet(self, endpoint, payload=None):

@@ -112,7 +112,7 @@ class TestSum(unittest.TestCase):
             'classification': 'FalsePositive'
         }
 
-        res = client.classifyPersonMatch(person)
+        res = client.classifyPersonHit(person)
 
         self.assertEqual(res['status'], 'Success')
 
