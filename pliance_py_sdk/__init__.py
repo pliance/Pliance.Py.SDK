@@ -15,25 +15,25 @@ class ClientFactory:
     def executePost(self, endpoint, data, givenName, subject):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
-        response = requests.post(f'{self.url}api/{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
+        response = requests.post(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
         return response.json()
 
     def executePut(self, endpoint, data, givenName, subject):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
-        response = requests.put(f'{self.url}api/{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
+        response = requests.put(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
         return response.json()
 
     def executeGet(self, endpoint, givenName, subject, payload=None):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
-        response = requests.get(f'{self.url}api/{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
+        response = requests.get(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
         return response.json()
 
     def executeDelete(self, endpoint, payload, givenName, subject):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
-        response = requests.delete(f'{self.url}api/{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
+        response = requests.delete(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
         return response.json()
 
     def __getJwt(self, givenName, subject):
@@ -55,76 +55,78 @@ class PlianceClient:
         self.givenName = givenName
         self.subject = subject
 
-    def ping(self):
-        return self.__executeGet('ping')
-
-    # Person
-    def registerPerson(self, command):
-        return self.__executePut('PersonCommand', command)
-
-    def viewPerson(self, query):
-        return self.__executeGet('PersonQuery', payload=query)
-
-    def searchPerson(self, query):
-        return self.__executeGet('PersonQuery/Search', payload=query)
-
-    def deletePerson(self, command):
-        return self.__executeDelete('PersonCommand', command)
+    # inject
+    def archiveCompany(self, command):
+    	return self.__executePost('api/CompanyCommand/Archive', command)
 
     def archivePerson(self, command):
-        return self.__executePost('PersonCommand/Archive', command)
+    	return self.__executePost('api/PersonCommand/Archive', command)
 
-    def unarchivePerson(self, command):
-        return self.__executePost('PersonCommand/Unarchive', command)
-
-    def classifyPersonHit(self, command):
-        return self.__executePost('PersonCommand/Classify', command)
-
-    # Company
-    def registerCompany(self, query):
-        return self.__executePut('CompanyCommand', query)
-
-    def viewCompany(self, query):
-        return self.__executeGet('CompanyQuery', payload=query)
-
-    def searchCompany(self, query):
-        return self.__executeGet('CompanyQuery/Search', payload=query)
-
-    def deleteCompany(self, command):
-        return self.__executeDelete('CompanyCommand', command)
-
-    def archiveCompany(self, command):
-        return self.__executePost('CompanyCommand/Archive', command)
-
-    def unarchiveCompany(self, command):
-        return self.__executePost('CompanyCommand/Unarchive', command)
+    def beneficiaries(self, query):
+    	return self.__executeGet('api/CompanyQuery/Graph/Beneficiaries', query)
 
     def classifyCompanyHit(self, command):
-        return self.__executePost('CompanyCommand/Classify', command)   
+    	return self.__executePost('api/CompanyCommand/Classify', command)
 
-    def beneficiariesCompanyGraph(self, query):
-        return self.__executePost('CompanyQuery/Graph/Beneficiaries', query)              
+    def classifyPersonHit(self, command):
+    	return self.__executePost('api/PersonCommand/Classify', command)
 
-    # Feed
+    def deleteCompany(self, command):
+    	return self.__executeDelete('api/CompanyCommand/', command)
+
+    def deletePerson(self, command):
+    	return self.__executeDelete('api/PersonCommand/', command)
+
     def feed(self, query):
-        return self.__executeGet('FeedQuery', payload=query)
+    	return self.__executeGet('api/FeedQuery/', query)
 
-    # Watchlist
-    def watchlistPerson(self, query):
-        return self.__executeGet('WatchlistQuery', payload=query)       
+    def getReport(self, query):
+    	return self.__executeGet('api/ReportQuery/', query)
 
-    def watchlistPerson_v2(self, query):
-        return self.__executeGet('WatchlistQuery/v2', payload=query) 
+    def getWebhook(self, query):
+    	return self.__executeGet('api/WebhookQuery/', query)
+
+    def ping(self, query):
+    	return self.__executeGet('api/Ping/', query)
+
+    def registerCompany(self, command):
+    	return self.__executePut('api/CompanyCommand/', command)
+
+    def registerPerson(self, command):
+    	return self.__executePut('api/PersonCommand/', command)
+
+    def saveWebhook(self, command):
+    	return self.__executePut('api/WebhookCommand/', command)
+
+    def searchCompany(self, query):
+    	return self.__executeGet('api/CompanyQuery/Search', query)
+
+    def searchPerson(self, query):
+    	return self.__executeGet('api/PersonQuery/Search', query)
+
+    def unarchiveCompany(self, command):
+    	return self.__executePost('api/CompanyCommand/Unarchive', command)
+
+    def unarchivePerson(self, command):
+    	return self.__executePost('api/PersonCommand/Unarchive', command)
+
+    def viewCompany(self, query):
+    	return self.__executeGet('api/CompanyQuery/', query)
+
+    def viewPerson(self, query):
+    	return self.__executeGet('api/PersonQuery/', query)
 
     def watchlistCompany(self, query):
-        return self.__executeGet('WatchlistQuery/Company', payload=query) 
+    	return self.__executeGet('api/WatchlistQuery/Company', query)
 
-    # Webhook
-    def webhookGet(self, query):
-        return self.__executeGet('WebhookQuery', payload=query)
+    def watchlistPerson(self, query):
+    	return self.__executeGet('api/WatchlistQuery/', query)
 
-    def webhookSave(self, command):
-        return self.__executePut('WebhookCommand', command)
+    def watchlistPersonV2(self, query):
+    	return self.__executeGet('api/WatchlistQuery/v2', query)
+
+
+    # !inject
 
     ## Internal
     def __executeGet(self, endpoint, payload=None):

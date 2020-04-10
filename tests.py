@@ -52,14 +52,14 @@ class TestSum(unittest.TestCase):
     def test_ping(self):
         clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
         client = clientFactory.create('Adam', '1')
-        res = client.ping()
+        res = client.ping({})
 
         self.assertEqual(res['message'], 'Pong')
 
     def test_ping_not_cert(self):
         clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert=None)
         client = clientFactory.create('Adam', '1')
-        res = client.ping()
+        res = client.ping({})
 
         self.assertEqual(res['message'], 'Pong')
 
