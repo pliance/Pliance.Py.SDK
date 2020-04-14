@@ -55,15 +55,15 @@ class PlianceClient:
         self.givenName = givenName
         self.subject = subject
 
-    # inject
+    # @inject: methods
     def archiveCompany(self, command):
     	return self.__executePost('api/CompanyCommand/Archive', command)
 
     def archivePerson(self, command):
     	return self.__executePost('api/PersonCommand/Archive', command)
 
-    def beneficiaries(self, query):
-    	return self.__executeGet('api/CompanyQuery/Graph/Beneficiaries', query)
+    def beneficiaries(self, request):
+    	return self.__executeGet('api/CompanyQuery/Graph/Beneficiaries', request)
 
     def classifyCompanyHit(self, command):
     	return self.__executePost('api/CompanyCommand/Classify', command)
@@ -77,17 +77,17 @@ class PlianceClient:
     def deletePerson(self, command):
     	return self.__executeDelete('api/PersonCommand/', command)
 
-    def feed(self, query):
-    	return self.__executeGet('api/FeedQuery/', query)
+    def feed(self, request):
+    	return self.__executeGet('api/FeedQuery/', request)
 
-    def getReport(self, query):
-    	return self.__executeGet('api/ReportQuery/', query)
+    def getReport(self, request):
+    	return self.__executeGet('api/ReportQuery/', request)
 
-    def getWebhook(self, query):
-    	return self.__executeGet('api/WebhookQuery/', query)
+    def getWebhook(self, request):
+    	return self.__executeGet('api/WebhookQuery/', request)
 
-    def ping(self, query):
-    	return self.__executeGet('api/Ping/', query)
+    def ping(self, request):
+    	return self.__executeGet('api/Ping/', request)
 
     def registerCompany(self, command):
     	return self.__executePut('api/CompanyCommand/', command)
@@ -98,11 +98,11 @@ class PlianceClient:
     def saveWebhook(self, command):
     	return self.__executePut('api/WebhookCommand/', command)
 
-    def searchCompany(self, query):
-    	return self.__executeGet('api/CompanyQuery/Search', query)
+    def searchCompany(self, request):
+    	return self.__executeGet('api/CompanyQuery/Search', request)
 
-    def searchPerson(self, query):
-    	return self.__executeGet('api/PersonQuery/Search', query)
+    def searchPerson(self, request):
+    	return self.__executeGet('api/PersonQuery/Search', request)
 
     def unarchiveCompany(self, command):
     	return self.__executePost('api/CompanyCommand/Unarchive', command)
@@ -110,23 +110,22 @@ class PlianceClient:
     def unarchivePerson(self, command):
     	return self.__executePost('api/PersonCommand/Unarchive', command)
 
-    def viewCompany(self, query):
-    	return self.__executeGet('api/CompanyQuery/', query)
+    def viewCompany(self, request):
+    	return self.__executeGet('api/CompanyQuery/', request)
 
-    def viewPerson(self, query):
-    	return self.__executeGet('api/PersonQuery/', query)
+    def viewPerson(self, request):
+    	return self.__executeGet('api/PersonQuery/', request)
 
-    def watchlistCompany(self, query):
-    	return self.__executeGet('api/WatchlistQuery/Company', query)
+    def watchlistCompany(self, request):
+    	return self.__executeGet('api/WatchlistQuery/Company', request)
 
-    def watchlistPerson(self, query):
-    	return self.__executeGet('api/WatchlistQuery/', query)
+    def watchlistPerson(self, request):
+    	return self.__executeGet('api/WatchlistQuery/', request)
 
-    def watchlistPersonV2(self, query):
-    	return self.__executeGet('api/WatchlistQuery/v2', query)
+    def watchlistPersonV2(self, request):
+    	return self.__executeGet('api/WatchlistQuery/v2', request)
 
-
-    # !inject
+    # @inject: !methods
 
     ## Internal
     def __executeGet(self, endpoint, payload=None):
