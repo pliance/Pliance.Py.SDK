@@ -36,238 +36,367 @@ class TestSum(unittest.TestCase):
         letters = string.ascii_lowercase
         return ''.join(random.choice(letters) for i in range(stringLength))    
 
-    def test_bad_request(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+    def createFactory(self):
+        return ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+
+    def createClient(self):
+        factory = self.createFactory()
+
+        return factory.create('Adam Furtenbach', '1337')
+
+    def test_bad_request(self):        
+        client = self.createClient()
 
         person = {
+            'personReferenceId': self.randomString(),
         }
 
         try:
-            res = client.registerPerson(person)
-            self.assertTrue(false)
+            response = client.view_person(person)
+            self.assertTrue(False)
         except ApiException as error:
-            self.assertEqual(str(error), 'Missing FirstName')
+            return
+
+    def test_ping_no_cert(self):
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert='temp.pem')
+        client = clientFactory.create('Adam', '1')
+        res = client.ping({})
+
+        self.assertEqual(res['message'], 'Pong')
 
     def test_ping(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+        client = self.createClient()
         res = client.ping({})
 
-        self.assertEqual(res['message'], 'Pong')
-
-    def test_ping_not_cert(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert=None)
-        client = clientFactory.create('Adam', '1')
-        res = client.ping({})
-
-        self.assertEqual(res['message'], 'Pong')
+        self.assertEqual(res['message'], 'Pong') 
 
     def test_register_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
-
-        person = {
-            'firstName': 'Osama',
-            'lastName': 'bin laden',
-            'personReferenceId': 'reference-id'
-        }
-
-        res = client.registerPerson(person)
-
-        self.assertEqual(res['status'], 'Success')
-
-    def test_view_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
-
-        person = {
-            'personReferenceId': 'reference-id'
-        }
-
-        res = client.viewPerson(person)
-
-       # print(res)
-        self.assertEqual(res['data']['personReferenceId'], 'reference-id')
-
-    def test_classify_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+        client = self.createClient()
         id = self.randomString()
-        registerPerson = {
-            'firstName': 'Ebba',
-            'lastName': 'Busch',
-            'personReferenceId': id,
-            'identity': {
-                "country": "se"
-            }
-        }
+        res = self.createPerson(client, id)
 
-        res = client.registerPerson(registerPerson)
-
-        person = {
-            'personReferenceId': id,
-            'matchId': res['data']['hits'][0][0]['matchId'],
-            'aliasId': res['data']['hits'][0][0]['aliasId'],
-            'classification': 'FalsePositive'
-        }
-
-        res = client.classifyPersonHit(person)
-
-        self.assertEqual(res['status'], 'Success')
-
-    def test_search_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
-
-        query = {
-            'query': 'Osama bin',
-            'page': {
-                'size': 10,
-                'no': 1
-            },
-            'filter': {
-                'isSanction': True
-            }
-        }
-
-        res = client.searchPerson(query)
-
-        self.assertTrue(len(res['data']) > 0)
+        self.assertTrue(res['success'])
 
     def test_archive_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+        client = self.createClient()
         id = self.randomString()
-        registerPerson = {
-            'firstName': 'Osama',
-            'lastName': 'bin laden',
-            'personReferenceId': id
-        }
+        self.createPerson(client, id)
+        
+        res = self.archivePerson(client, id)
 
-        res = client.registerPerson(registerPerson)
+        self.assertTrue(res['success'])        
 
-        person = {
-            'personReferenceId': id
-        }
-
-        res = client.archivePerson(person)
-
-        self.assertEqual(res['status'], 'Success')
 
     def test_unarchive_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+        client = self.createClient()
+        id = self.randomString()
+        self.createPerson(client, id)
+        self.archivePerson(client, id)
 
-        person = {
-            'personReferenceId': 'reference-id'
-        }
+        command = {
+            'personReferenceId': id,
+        }       
 
-        res = client.unarchivePerson(person)
+        res = client.unarchive_person(command)
 
-        self.assertEqual(res['status'], 'Success')
+        self.assertTrue(res['success'])
 
     def test_delete_person(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+        client = self.createClient()
         id = self.randomString()
-        registerPerson = {
+        self.createPerson(client, id)
+
+        command = {
+            'personReferenceId': id,
+        }       
+
+        res = client.delete_person(command)
+
+        self.assertTrue(res['success'])
+
+    def test_view_person(self):
+        client = self.createClient()
+        id = self.randomString()
+        self.createPerson(client, id)
+
+        command = {
+            'personReferenceId': id,
+        }       
+
+        res = client.view_person(command)
+
+        self.assertTrue(res['success'])
+
+    def test_search_person(self):
+        client = self.createClient()
+        id = self.randomString()
+        self.createPerson(client, id)
+
+        command = {
+            'query': 'Osama',
+        }       
+
+        res = client.search_person(command)
+
+        self.assertTrue(res['success'])        
+
+    def test_classify_person(self):
+        client = self.createClient()
+        id = self.randomString()
+        person = self.createPerson(client, id)
+        match = person['data']['hits'][0][0]
+
+        command = {
+            'personReferenceId': id,
+            'aliasId': match['aliasId'],
+            'matchId': match['matchId'],
+            'classification': 'FalsePositive'
+        }       
+
+        res = client.view_person(command)
+
+        self.assertTrue(res['success'])
+
+
+
+
+
+
+    def createPerson(self, client, id):
+        command = {
             'firstName': 'Osama',
-            'lastName': 'bin laden',
-            'personReferenceId': id
+            'lastName': 'bin Laden',
+            'personReferenceId': id,
         }
 
-        res = client.registerPerson(registerPerson)
+        return client.register_person(command)
 
-        person = {
-            'personReferenceId': id
-        }
+    def archivePerson(self, client, id):
+        command = {
+            'personReferenceId': id,
+        }       
 
-        res = client.deletePerson(person)
-
-        self.assertEqual(res['status'], 'Success')
+        return client.archive_person(command)
 
 
-    def test_register_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
 
-        company = {
-            'name': 'Plisec',
-            'companyReferenceId': 'comp-reference-id',
-            'identity': {
-                'identity': '559161-4275',
-                'country': 'sv'
-            }
-        }
+        #self.assertEqual(res['status'], 'Success')        
 
-        res = client.registerCompany(company)
+    # def test_ping(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     res = client.ping({})
 
-        self.assertEqual(res['status'], 'Success')
+    #     self.assertEqual(res['message'], 'Pong')            
 
-    def test_view_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
 
-        company = {
-            'companyReferenceId': 'comp-reference-id'
-        }
+    # def test_ping(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     res = client.ping({})
 
-        res = client.viewCompany(company)
+    #     self.assertEqual(res['message'], 'Pong')
 
-        self.assertEqual(res['data']['companyReferenceId'], 'comp-reference-id')
+    # def test_ping_not_cert(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert=None)
+    #     client = clientFactory.create('Adam', '1')
+    #     res = client.ping({})
 
-    def test_search_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
+    #     self.assertEqual(res['message'], 'Pong')
 
-        query = {
-            'query': 'Pliesec',
-            'page': {
-                'size': 10,
-                'no': 1
-            },
-            'filter': {
-                'isSanction': True
-            }
-        }
 
-        res = client.searchCompany(query)
 
-        self.assertTrue(len(res['data']) > 0)
+    # def test_view_person(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
 
-    def test_archive_company(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
-        id = self.randomString()
+    #     person = {
+    #         'personReferenceId': 'reference-id'
+    #     }
 
-        registerCompany = {
-            'name': 'Plisec',
-            'companyReferenceId': id,
-            'identity': {
-                'identity': '559161-4275',
-                'country': 'sv'
-            }
-        }
+    #     res = client.viewPerson(person)
 
-        res = client.registerCompany(registerCompany)        
+    #    # print(res)
+    #     self.assertEqual(res['data']['personReferenceId'], 'reference-id')
 
-        company = {
-            'companyReferenceId': id
-        }
+    # def test_classify_person(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     id = self.randomString()
+    #     registerPerson = {
+    #         'firstName': 'Ebba',
+    #         'lastName': 'Busch',
+    #         'personReferenceId': id,
+    #         'identity': {
+    #             "country": "se"
+    #         }
+    #     }
 
-        res = client.archiveCompany(company)
+    #     res = client.registerPerson(registerPerson)
 
-        self.assertEqual(res['status'], 'Success')
+    #     person = {
+    #         'personReferenceId': id,
+    #         'matchId': res['data']['hits'][0][0]['matchId'],
+    #         'aliasId': res['data']['hits'][0][0]['aliasId'],
+    #         'classification': 'FalsePositive'
+    #     }
 
-    def test_feed(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
-        client = clientFactory.create('Adam', '1')
-        query = {}
+    #     res = client.classifyPersonHit(person)
 
-        res = client.feed(query)        
+    #     self.assertEqual(res['status'], 'Success')
 
-        self.assertEqual(res['status'], 'Success')        
+    # def test_search_person(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+
+    #     query = {
+    #         'query': 'Osama bin',
+    #         'page': {
+    #             'size': 10,
+    #             'no': 1
+    #         },
+    #         'filter': {
+    #             'isSanction': True
+    #         }
+    #     }
+
+    #     res = client.searchPerson(query)
+
+    #     self.assertTrue(len(res['data']) > 0)
+
+    # def test_archive_person(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     id = self.randomString()
+    #     registerPerson = {
+    #         'firstName': 'Osama',
+    #         'lastName': 'bin laden',
+    #         'personReferenceId': id
+    #     }
+
+    #     res = client.registerPerson(registerPerson)
+
+    #     person = {
+    #         'personReferenceId': id
+    #     }
+
+    #     res = client.archivePerson(person)
+
+    #     self.assertEqual(res['status'], 'Success')
+
+    # def test_unarchive_person(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+
+    #     person = {
+    #         'personReferenceId': 'reference-id'
+    #     }
+
+    #     res = client.unarchivePerson(person)
+
+    #     self.assertEqual(res['status'], 'Success')
+
+    # def test_delete_person(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     id = self.randomString()
+    #     registerPerson = {
+    #         'firstName': 'Osama',
+    #         'lastName': 'bin laden',
+    #         'personReferenceId': id
+    #     }
+
+    #     res = client.registerPerson(registerPerson)
+
+    #     person = {
+    #         'personReferenceId': id
+    #     }
+
+    #     res = client.deletePerson(person)
+
+    #     self.assertEqual(res['status'], 'Success')
+
+
+    # def test_register_company(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+
+    #     company = {
+    #         'name': 'Plisec',
+    #         'companyReferenceId': 'comp-reference-id',
+    #         'identity': {
+    #             'identity': '559161-4275',
+    #             'country': 'sv'
+    #         }
+    #     }
+
+    #     res = client.registerCompany(company)
+
+    #     self.assertEqual(res['status'], 'Success')
+
+    # def test_view_company(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+
+    #     company = {
+    #         'companyReferenceId': 'comp-reference-id'
+    #     }
+
+    #     res = client.viewCompany(company)
+
+    #     self.assertEqual(res['data']['companyReferenceId'], 'comp-reference-id')
+
+    # def test_search_company(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+
+    #     query = {
+    #         'query': 'Pliesec',
+    #         'page': {
+    #             'size': 10,
+    #             'no': 1
+    #         },
+    #         'filter': {
+    #             'isSanction': True
+    #         }
+    #     }
+
+    #     res = client.searchCompany(query)
+
+    #     self.assertTrue(len(res['data']) > 0)
+
+    # def test_archive_company(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     id = self.randomString()
+
+    #     registerCompany = {
+    #         'name': 'Plisec',
+    #         'companyReferenceId': id,
+    #         'identity': {
+    #             'identity': '559161-4275',
+    #             'country': 'sv'
+    #         }
+    #     }
+
+    #     res = client.registerCompany(registerCompany)        
+
+    #     company = {
+    #         'companyReferenceId': id
+    #     }
+
+    #     res = client.archiveCompany(company)
+
+    #     self.assertEqual(res['status'], 'Success')
+
+    # def test_feed(self):
+    #     clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+    #     client = clientFactory.create('Adam', '1')
+    #     query = {}
+
+    #     res = client.feed(query)        
+
+    #     self.assertEqual(res['status'], 'Success')        
 
 if __name__ == '__main__':
     pfx_to_pem('client.pfx', [])

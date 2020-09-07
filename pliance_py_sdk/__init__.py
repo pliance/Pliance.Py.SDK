@@ -56,73 +56,70 @@ class PlianceClient:
         self.subject = subject
 
     # @inject: methods
-    def archiveCompany(self, command):
+    def archive_company(self, command):
     	return self.__executePost('api/CompanyCommand/Archive', command)
 
-    def archivePerson(self, command):
+    def archive_person(self, command):
     	return self.__executePost('api/PersonCommand/Archive', command)
 
-    def beneficiaries(self, request):
-    	return self.__executeGet('api/CompanyQuery/Graph/Beneficiaries', request)
-
-    def classifyCompanyHit(self, command):
+    def classify_company_hit(self, command):
     	return self.__executePost('api/CompanyCommand/Classify', command)
 
-    def classifyPersonHit(self, command):
+    def classify_person_hit(self, command):
     	return self.__executePost('api/PersonCommand/Classify', command)
 
-    def deleteCompany(self, command):
-    	return self.__executeDelete('api/CompanyCommand/', command)
+    def delete_company(self, command):
+    	return self.__executeDelete('api/CompanyCommand', command)
 
-    def deletePerson(self, command):
-    	return self.__executeDelete('api/PersonCommand/', command)
+    def delete_person(self, command):
+    	return self.__executeDelete('api/PersonCommand', command)
 
     def feed(self, request):
-    	return self.__executeGet('api/FeedQuery/', request)
+    	return self.__executeGet('api/FeedQuery', request)
 
-    def getReport(self, request):
-    	return self.__executeGet('api/ReportQuery/', request)
+    def get_report(self, request):
+    	return self.__executeGet('api/ReportQuery', request)
 
-    def getWebhook(self, request):
-    	return self.__executeGet('api/WebhookQuery/', request)
+    def get_webhook(self, request):
+    	return self.__executeGet('api/WebhookQuery', request)
 
     def ping(self, request):
-    	return self.__executeGet('api/Ping/', request)
+    	return self.__executeGet('api/Ping', request)
 
-    def registerCompany(self, command):
-    	return self.__executePut('api/CompanyCommand/', command)
+    def register_company(self, command):
+    	return self.__executePut('api/CompanyCommand', command)
 
-    def registerPerson(self, command):
-    	return self.__executePut('api/PersonCommand/', command)
+    def register_person(self, command):
+    	return self.__executePut('api/PersonCommand', command)
 
-    def saveWebhook(self, command):
-    	return self.__executePut('api/WebhookCommand/', command)
+    def save_webhook(self, command):
+    	return self.__executePut('api/WebhookCommand', command)
 
-    def searchCompany(self, request):
+    def search_company(self, request):
     	return self.__executeGet('api/CompanyQuery/Search', request)
 
-    def searchPerson(self, request):
+    def search_person(self, request):
     	return self.__executeGet('api/PersonQuery/Search', request)
 
-    def unarchiveCompany(self, command):
+    def unarchive_company(self, command):
     	return self.__executePost('api/CompanyCommand/Unarchive', command)
 
-    def unarchivePerson(self, command):
+    def unarchive_person(self, command):
     	return self.__executePost('api/PersonCommand/Unarchive', command)
 
-    def viewCompany(self, request):
-    	return self.__executeGet('api/CompanyQuery/', request)
+    def view_company(self, request):
+    	return self.__executeGet('api/CompanyQuery', request)
 
-    def viewPerson(self, request):
-    	return self.__executeGet('api/PersonQuery/', request)
+    def view_person(self, request):
+    	return self.__executeGet('api/PersonQuery', request)
 
-    def watchlistCompany(self, request):
+    def watchlist_company(self, request):
     	return self.__executeGet('api/WatchlistQuery/Company', request)
 
-    def watchlistPerson(self, request):
-    	return self.__executeGet('api/WatchlistQuery/', request)
+    def watchlist_person(self, request):
+    	return self.__executeGet('api/WatchlistQuery', request)
 
-    def watchlistPersonV2(self, request):
+    def watchlist_person_v2(self, request):
     	return self.__executeGet('api/WatchlistQuery/v2', request)
 
     # @inject: !methods
