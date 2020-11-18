@@ -16,24 +16,41 @@ class ClientFactory:
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
         response = requests.post(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
+
+        if response.status_code / 100 != 2:
+            raise ApiException(response.status_code)
+
         return response.json()
 
     def executePut(self, endpoint, data, givenName, subject):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
         response = requests.put(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
+
+        if response.status_code / 100 != 2:
+            raise ApiException(response.status_code)
+
         return response.json()
 
     def executeGet(self, endpoint, givenName, subject, payload=None):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
         response = requests.get(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
+
+        if response.status_code / 100 != 2:
+            raise ApiException(response.status_code)
+
         return response.json()
+
 
     def executeDelete(self, endpoint, payload, givenName, subject):
         token = self.__getJwt(givenName, subject)
         headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
         response = requests.delete(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
+
+        if response.status_code / 100 != 2:
+            raise ApiException(response.status_code)
+                
         return response.json()
 
     def __getJwt(self, givenName, subject):
