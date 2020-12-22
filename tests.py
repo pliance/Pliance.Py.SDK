@@ -13,9 +13,9 @@ import string
 from pliance_py_sdk import ClientFactory, ApiException
 
 @contextlib.contextmanager
-def pfx_to_pem(pfx_path, pfx_password):
+def pfx_to_pem(pfx_path, pfx_password, output):
     ''' Decrypts the .pfx file to be used with requests. '''
-    t_pem = 'temp.pem'
+    t_pem = output
     f_pem = open(t_pem, 'wb')
     pfx = open(pfx_path, 'rb').read()
     p12 = OpenSSL.crypto.load_pkcs12(pfx, pfx_password)
@@ -37,7 +37,7 @@ class TestSum(unittest.TestCase):
         return ''.join(random.choice(letters) for i in range(stringLength))    
 
     def createFactory(self):
-        return ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='temp.pem')
+        return ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='cert.pem')
 
     def createClient(self):
         factory = self.createFactory()
@@ -57,8 +57,15 @@ class TestSum(unittest.TestCase):
         except ApiException as error:
             return
 
+    def test_ping_cert_with_password(self):
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local.pliance.io/', cert='cert-password.pem')
+        client = clientFactory.create('Adam', '1')
+        res = client.ping({})
+
+        self.assertEqual(res['message'], 'Pong')            
+
     def test_ping_no_cert(self):
-        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert='temp.pem')
+        clientFactory = ClientFactory('2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b', 'Demo', 'https://local-no-cert.pliance.io/', cert='cert.pem')
         client = clientFactory.create('Adam', '1')
         res = client.ping({})
 
@@ -357,5 +364,6 @@ class TestSum(unittest.TestCase):
         return client.archive_person(command)
 
 if __name__ == '__main__':
-    pfx_to_pem('client.pfx', [])
+    pfx_to_pem('client.pfx', [], 'cert.pem')
+    pfx_to_pem('client-password.pfx', str.encode('password'), 'cert-password.pem')
     unittest.main()
