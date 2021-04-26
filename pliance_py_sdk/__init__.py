@@ -94,8 +94,14 @@ class PlianceClient:
     def feed(self, request):
     	return self.__executeGet('api/FeedQuery', request)
 
-    def get_report(self, request):
-    	return self.__executeGet('api/ReportQuery', request)
+    def get_company_report(self, request):
+    	return self.__executeGet('api/ReportQuery/CompanyReport', request)
+
+    def get_general_report(self, request):
+    	return self.__executeGet('api/ReportQuery/GeneralReport', request)
+
+    def get_person_report(self, request):
+    	return self.__executeGet('api/ReportQuery/PersonReport', request)
 
     def get_webhook(self, request):
     	return self.__executeGet('api/WebhookQuery', request)
