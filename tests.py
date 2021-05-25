@@ -4,31 +4,24 @@ import unittest
 import contextlib
 import os
 import requests
-import ssl
 import tempfile
-import OpenSSL.crypto #pip install pyopenssl
 import random
 import string
-
 from pliance_py_sdk import ClientFactory, ApiException
 
 @contextlib.contextmanager
 def pfx_to_pem(pfx_path, pfx_password, output):
     ''' Decrypts the .pfx file to be used with requests. '''
-    t_pem = output
-    f_pem = open(t_pem, 'wb')
-    pfx = open(pfx_path, 'rb').read()
-    p12 = OpenSSL.crypto.load_pkcs12(pfx, pfx_password)
-    f_pem.write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, p12.get_privatekey()))
-    f_pem.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, p12.get_certificate()))
-    ca = p12.get_ca_certificates()
-    if ca is not None:
-        for cert in ca:
-            f_pem.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, cert))
+    pfx = Path(pfx_path).read_bytes()
+    private_key, main_cert, add_certs = load_key_and_certificates(pfx, pfx_password.encode('utf-8'), None)
 
-    f_pem.close()
-    return t_pem
-
+    with NamedTemporaryFile(output) as t_pem:
+        with open(t_pem.name, 'wb') as f_pem:
+            pem_file.write(private_key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()))
+            pem_file.write(main_cert.public_bytes(Encoding.PEM))
+            for ca in add_certs:
+                pem_file.write(ca.public_bytes(Encoding.PEM))
+        yield t_pem.name
 
 class TestSum(unittest.TestCase):
 
