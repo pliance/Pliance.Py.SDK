@@ -106,11 +106,11 @@ class PlianceClient:
     def get_webhook(self, request):
     	return self.__executeGet('api/WebhookQuery', request)
 
-    def ownership(self, request):
-    	return self.__executeGet('api/CompanyQuery/Ownership', request)
-
     def ping(self, request):
     	return self.__executeGet('api/Ping', request)
+
+    def poke(self, query):
+    	return self.__executePost('api/WebhookQuery/Poke', query)
 
     def register_company(self, command):
     	return self.__executePut('api/CompanyCommand', command)

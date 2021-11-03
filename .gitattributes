@@ -1,3 +1,4 @@
 .gitattributes !filter !diff
+.pypirc filter=git-crypt diff=git-crypt
 #**/secrets/** filter=git-crypt diff=git-crypt
 **/*.pfx filter=git-crypt diff=git-crypt

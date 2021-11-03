@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pliance.py.sdk',
-      version='1.5.0',
+      version='2021.11.1',
       description='Pliance SDK',
       url='http://github.com/pliance',
       author='Pliance',
