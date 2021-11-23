@@ -7,21 +7,23 @@ import requests
 import tempfile
 import random
 import string
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.serialization import pkcs12
 from pliance_py_sdk import ClientFactory, ApiException
 
-@contextlib.contextmanager
 def pfx_to_pem(pfx_path, pfx_password, output):
-    ''' Decrypts the .pfx file to be used with requests. '''
-    pfx = Path(pfx_path).read_bytes()
-    private_key, main_cert, add_certs = load_key_and_certificates(pfx, pfx_password.encode('utf-8'), None)
+    with open(pfx_path, "rb") as f:
+        private_key, certificate, additional_certificates = serialization.pkcs12.load_key_and_certificates(f.read(), pfx_password)
 
-    with NamedTemporaryFile(output) as t_pem:
-        with open(t_pem.name, 'wb') as f_pem:
-            pem_file.write(private_key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()))
-            pem_file.write(main_cert.public_bytes(Encoding.PEM))
-            for ca in add_certs:
-                pem_file.write(ca.public_bytes(Encoding.PEM))
-        yield t_pem.name
+        with open(output, "wb") as pem:
+            pem.write(private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption()))
+            pem.write(certificate.public_bytes(serialization.Encoding.PEM))
+
+            for ca in additional_certificates:
+                pem.write(ca.public_bytes(serialization.Encoding.PEM))
 
 class TestSum(unittest.TestCase):
 
@@ -357,6 +359,6 @@ class TestSum(unittest.TestCase):
         return client.archive_person(command)
 
 if __name__ == '__main__':
-    pfx_to_pem('client.pfx', [], 'cert.pem')
-    pfx_to_pem('client-password.pfx', str.encode('password'), 'cert-password.pem')
+    pfx_to_pem('client.pfx', b'', 'cert.pem')
+    pfx_to_pem('client-password.pfx', b'password', 'cert-password.pem')
     unittest.main()
