@@ -85,6 +85,9 @@ class PlianceClient:
     def classify_person_hit(self, command):
     	return self.__executePost('api/PersonCommand/Classify', command)
 
+    def company_data(self, request):
+    	return self.__executeGet('api/CompanyQuery/CompanyData', request)
+
     def delete_company(self, command):
     	return self.__executeDelete('api/CompanyCommand', command)
 
