@@ -14,7 +14,7 @@ class ClientFactory:
 
     def executePost(self, endpoint, data, givenName, subject):
         token = self.__getJwt(givenName, subject)
-        headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
+        headers={'Authorization': 'Bearer ' + token.decode('utf-8'), 'User-Agent': 'Pliance.Py.SDK:VERSION'}
         response = requests.post(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
 
         if response.status_code / 100 != 2:
@@ -24,7 +24,7 @@ class ClientFactory:
 
     def executePut(self, endpoint, data, givenName, subject):
         token = self.__getJwt(givenName, subject)
-        headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
+        headers={'Authorization': 'Bearer ' + token.decode('utf-8'), 'User-Agent': 'Pliance.Py.SDK:VERSION'}
         response = requests.put(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, json=data)
 
         if response.status_code / 100 != 2:
@@ -34,7 +34,7 @@ class ClientFactory:
 
     def executeGet(self, endpoint, givenName, subject, payload=None):
         token = self.__getJwt(givenName, subject)
-        headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
+        headers={'Authorization': 'Bearer ' + token.decode('utf-8'), 'User-Agent': 'Pliance.Py.SDK:VERSION'}
         response = requests.get(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
 
         if response.status_code / 100 != 2:
@@ -45,7 +45,7 @@ class ClientFactory:
 
     def executeDelete(self, endpoint, payload, givenName, subject):
         token = self.__getJwt(givenName, subject)
-        headers={'Authorization': 'Bearer ' + token.decode('utf-8')}
+        headers={'Authorization': 'Bearer ' + token.decode('utf-8'), 'User-Agent': 'Pliance.Py.SDK:VERSION'}
         response = requests.delete(f'{self.url}{endpoint}', headers=headers, verify=True, cert=self.cert, params=payload)
 
         if response.status_code / 100 != 2:
