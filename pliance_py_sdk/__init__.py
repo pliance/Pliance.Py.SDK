@@ -115,6 +115,9 @@ class PlianceClient:
     def list_persons(self, request):
     	return self.__executeGet('api/PersonQuery/List', request)
 
+    def list_webhook_delivery_failures(self, query):
+    	return self.__executeGet('api/WebhookQuery/DeliveryFailures', query)
+
     def ping(self, request):
     	return self.__executeGet('api/Ping', request)
 
