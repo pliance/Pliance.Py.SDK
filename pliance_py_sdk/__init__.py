@@ -76,11 +76,23 @@ class PlianceClient:
     def archive_company(self, command):
     	return self.__executePost('api/CompanyCommand/Archive', command)
 
+    def archive_company_v2(self, command):
+    	return self.__executePost('api/CompanyV2Command/Archive', command)
+
     def archive_person(self, command):
     	return self.__executePost('api/PersonCommand/Archive', command)
 
+    def batch_register_person(self, command):
+    	return self.__executePut('api/PersonCommand/Batch', command)
+
     def classify_company_hit(self, command):
     	return self.__executePost('api/CompanyCommand/Classify', command)
+
+    def classify_company_v2_link(self, command):
+    	return self.__executePost('api/CompanyV2Command/ClassifyLink', command)
+
+    def classify_company_v2_match(self, command):
+    	return self.__executePost('api/CompanyV2Command/Classify', command)
 
     def classify_person_hit(self, command):
     	return self.__executePost('api/PersonCommand/Classify', command)
@@ -91,11 +103,14 @@ class PlianceClient:
     def delete_company(self, command):
     	return self.__executeDelete('api/CompanyCommand', command)
 
+    def delete_company_v2(self, command):
+    	return self.__executeDelete('api/CompanyV2Command', command)
+
     def delete_person(self, command):
     	return self.__executeDelete('api/PersonCommand', command)
 
-    def feed(self, request):
-    	return self.__executeGet('api/FeedQuery', request)
+    def delete_webhook_delivery_failure(self, command):
+    	return self.__executeDelete('api/WebhookCommand', command)
 
     def get_company_report(self, request):
     	return self.__executeGet('api/ReportQuery/CompanyReport', request)
@@ -127,6 +142,9 @@ class PlianceClient:
     def register_company(self, command):
     	return self.__executePut('api/CompanyCommand', command)
 
+    def register_company_v2(self, command):
+    	return self.__executePut('api/CompanyV2Command', command)
+
     def register_person(self, command):
     	return self.__executePut('api/PersonCommand', command)
 
@@ -142,17 +160,29 @@ class PlianceClient:
     def unarchive_company(self, command):
     	return self.__executePost('api/CompanyCommand/Unarchive', command)
 
+    def unarchive_company_v2(self, command):
+    	return self.__executePost('api/CompanyV2Command/Unarchive', command)
+
     def unarchive_person(self, command):
     	return self.__executePost('api/PersonCommand/Unarchive', command)
 
     def view_company(self, request):
     	return self.__executeGet('api/CompanyQuery', request)
 
+    def view_company_v2(self, query):
+    	return self.__executeGet('api/CompanyV2Query', query)
+
     def view_person(self, request):
     	return self.__executeGet('api/PersonQuery', request)
 
     def watchlist_company(self, request):
     	return self.__executeGet('api/WatchlistQuery/Company', request)
+
+    def watchlist_company_v2(self, request):
+    	return self.__executeGet('api/WatchlistQuery/CompanyV2', request)
+
+    def watchlist_company_v2_link(self, request):
+    	return self.__executeGet('api/WatchlistQuery/CompanyV2Link', request)
 
     def watchlist_person(self, request):
     	return self.__executeGet('api/WatchlistQuery', request)
