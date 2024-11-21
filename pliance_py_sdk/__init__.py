@@ -127,6 +127,9 @@ class PlianceClient:
     def list_companies(self, request):
     	return self.__executeGet('api/CompanyQuery/List', request)
 
+    def list_companies_v2(self, query):
+    	return self.__executeGet('api/CompanyV2Query/List', query)
+
     def list_persons(self, request):
     	return self.__executeGet('api/PersonQuery/List', request)
 
