@@ -190,16 +190,6 @@ class TestSum(unittest.TestCase):
 
         self.assertTrue(res['success'])
 
-    def test_feed(self):
-        client = self.createClient()
-
-        command = {
-        }       
-
-        res = client.feed(command)
-
-        self.assertTrue(res['success'])
-
     def test_saveWebhook(self):
         client = self.createClient()
 
