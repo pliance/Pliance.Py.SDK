@@ -1,4 +1,4 @@
-FROM python
+FROM python:3.14.3
 WORKDIR /work
 RUN python3 -m pip install --user --upgrade setuptools wheel
 ENV VERSION "2024.11.1"
