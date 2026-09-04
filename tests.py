@@ -3,6 +3,7 @@
 import unittest
 import contextlib
 import os
+import ssl
 import requests
 import tempfile
 import random
@@ -10,6 +11,28 @@ import string
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.serialization import pkcs12
 from pliance_py_sdk import ClientFactory, ApiException
+
+# The local dev stack's TLS leaf certificate for local.pliance.io predates
+# RFC 5280's Authority Key Identifier convention and has no AKI extension.
+# urllib3 2.x enables ssl.VERIFY_X509_STRICT by default on Python 3.13+,
+# which rejects that cert even though its chain is otherwise trusted (the
+# same cert passes plain `openssl verify`/`s_client`). Relax just that flag
+# for this local test run; this does not touch the SDK's own verify=True
+# behavior for real users.
+import urllib3.util.ssl_ as _urllib3_ssl
+import urllib3.connection as _urllib3_connection
+
+_orig_create_urllib3_context = _urllib3_ssl.create_urllib3_context
+
+
+def _create_urllib3_context_without_strict(*args, **kwargs):
+    context = _orig_create_urllib3_context(*args, **kwargs)
+    context.verify_flags &= ~ssl.VERIFY_X509_STRICT
+    return context
+
+
+_urllib3_ssl.create_urllib3_context = _create_urllib3_context_without_strict
+_urllib3_connection.create_urllib3_context = _create_urllib3_context_without_strict
 
 def pfx_to_pem(pfx_path, pfx_password, output):
     with open(pfx_path, "rb") as f:
